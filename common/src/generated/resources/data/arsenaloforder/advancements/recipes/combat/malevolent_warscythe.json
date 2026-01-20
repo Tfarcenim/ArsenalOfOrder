@@ -1,0 +1,35 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_incomplete_blade": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "arsenaloforder:incomplete_blade"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "arsenaloforder:malevolent_warscythe"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_incomplete_blade",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "arsenaloforder:malevolent_warscythe"
+    ]
+  },
+  "sends_telemetry_event": false
+}

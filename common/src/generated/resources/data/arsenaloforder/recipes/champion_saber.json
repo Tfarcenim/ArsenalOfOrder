@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:smithing_transform",
+  "addition": [],
+  "base": {
+    "item": "arsenaloforder:incomplete_blade"
+  },
+  "result": {
+    "item": "arsenaloforder:champion_saber"
+  },
+  "template": {
+    "item": "arsenaloforder:champion_rune"
+  }
+}

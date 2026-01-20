@@ -7,7 +7,7 @@
     "mixins": [
     ],
     "client": [
-        "MixinTitleScreen"
+      "tfar.arsenaloforder.mixin.MixinTitleScreen"
     ],
     "server": [
     ],

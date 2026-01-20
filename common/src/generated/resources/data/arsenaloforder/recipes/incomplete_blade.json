@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:smithing_transform",
+  "addition": [],
+  "base": {
+    "item": "minecraft:netherite_sword"
+  },
+  "result": {
+    "item": "arsenaloforder:incomplete_blade"
+  },
+  "template": {
+    "item": "minecraft:nether_star"
+  }
+}
