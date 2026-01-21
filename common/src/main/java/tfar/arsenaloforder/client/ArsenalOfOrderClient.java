@@ -3,11 +3,14 @@ package tfar.arsenaloforder.client;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Explosion;
 import org.lwjgl.glfw.GLFW;
 import tfar.arsenaloforder.PlayerDuck;
 import tfar.arsenaloforder.item.MalevolentWarscytheItem;
+import tfar.arsenaloforder.network.CustomExplosionPacketS2C;
 import tfar.arsenaloforder.network.EntityEventPacketS2C;
 
 public class ArsenalOfOrderClient {
@@ -30,6 +33,18 @@ public class ArsenalOfOrderClient {
                     }
                 }
             }
+        }
+    }
+
+    public static void handle(CustomExplosionPacketS2C packet) {
+        ClientLevel level = Minecraft.getInstance().level;
+        LocalPlayer player = Minecraft.getInstance().player;
+        Explosion explosion = packet.type().create(level,null, null,null,
+                packet.x(), packet.y(), packet.z(), packet.power(),false, Explosion.BlockInteraction.KEEP);
+        explosion.getToBlow().addAll( packet.toBlow());
+        explosion.finalizeExplosion(true);
+        if (packet.knockback() != null) {
+            player.setDeltaMovement(player.getDeltaMovement().add(packet.knockback()));
         }
     }
 }

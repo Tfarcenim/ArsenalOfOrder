@@ -5,11 +5,14 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.Explosion;
+import net.minecraft.world.level.Level;
 import tfar.arsenaloforder.network.C2SModPacket;
 import tfar.arsenaloforder.network.S2CModPacket;
 import tfar.arsenaloforder.platform.services.IPlatformHelper;
 import net.fabricmc.loader.api.FabricLoader;
 
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -64,6 +67,21 @@ public class FabricPlatformHelper implements IPlatformHelper {
 
     @Override
     public void sendToTracking(S2CModPacket msg, Entity entity, boolean includeSelf) {
+
+    }
+
+    @Override
+    public boolean onExplosionStart(Level level, Explosion explosion) {
+        return false;
+    }
+
+    @Override
+    public boolean getMobGriefingEvent(Level level, Entity source) {
+        return false;
+    }
+
+    @Override
+    public void onExplosionDetonate(Level level, Explosion explosion, List<Entity> list, double diameter) {
 
     }
 }

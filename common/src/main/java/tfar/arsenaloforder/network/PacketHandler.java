@@ -13,6 +13,7 @@ public class PacketHandler {
     public static void registerPackets() {
         Services.PLATFORM.registerServerPlayPacket(KeybindPacketC2S.class, KeybindPacketC2S::fromPacket);
         Services.PLATFORM.registerClientPlayPacket(EntityEventPacketS2C.class, EntityEventPacketS2C::fromPacket);
+        Services.PLATFORM.registerClientPlayPacket(CustomExplosionPacketS2C.class, CustomExplosionPacketS2C::fromPacket);
     }
 
     public static void sendToServer(C2SModPacket packet) {

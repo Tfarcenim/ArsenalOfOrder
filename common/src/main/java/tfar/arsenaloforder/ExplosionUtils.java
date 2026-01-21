@@ -10,11 +10,27 @@ import net.minecraft.world.level.ExplosionDamageCalculator;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
+import tfar.arsenaloforder.network.CustomExplosionPacketS2C;
 import tfar.arsenaloforder.platform.Services;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class ExplosionUtils {
-    public enum ExplosionType {
-        LIGHT;
+
+    @FunctionalInterface
+    public interface ExplosionType<E extends Explosion> {
+        Map<ExplosionType<?>,String> MAP = new HashMap<>();
+        Map<String,ExplosionType<?>> REVERSE_MAP = new HashMap<>();
+        ExplosionType<LightExplosion> LIGHT_EXPLOSION = put(LightExplosion::new,"light");
+
+        static <E extends  Explosion> ExplosionType<E>put(ExplosionType<E>type,String s) {
+            MAP.put(type,s);
+            REVERSE_MAP.put(s,type);
+            return type;
+        }
+
+        E create(Level level, @Nullable Entity source, @Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator damageCalculator, double x, double y, double z, float pRadius, boolean pFire, Explosion.BlockInteraction blockInteraction);
     }
 
     public static Explosion explode(Level level, @Nullable Entity pSource, double x, double y, double z, float pRadius, Level.ExplosionInteraction pExplosionInteraction, ExplosionType type) {
@@ -34,7 +50,7 @@ public class ExplosionUtils {
                     Services.PLATFORM.getMobGriefingEvent(level, pSource) ? getDestroyType(level,GameRules.RULE_MOB_EXPLOSION_DROP_DECAY) : Explosion.BlockInteraction.KEEP;
             case TNT -> getDestroyType(level,GameRules.RULE_TNT_EXPLOSION_DROP_DECAY);
         };
-        Explosion explosion = createTypedExplosion(level, pSource, pDamageSource, pDamageCalculator, x, y, z, pRadius, pFire, explosion$blockinteraction,type);
+        Explosion explosion = type.create(level, pSource, pDamageSource, pDamageCalculator, x, y, z, pRadius, pFire, explosion$blockinteraction);
         if (Services.PLATFORM.onExplosionStart(level, explosion)) return explosion;
         explosion.explode();
         explosion.finalizeExplosion(pSpawnParticles);
@@ -45,26 +61,13 @@ public class ExplosionUtils {
 
         for(ServerPlayer serverplayer : ((ServerLevel)level).players()) {
             if (serverplayer.distanceToSqr(x, y, z) < 4096.0D) {
-                serverplayer.connection.send(new ClientboundExplodePacket(x, y, z, pRadius, explosion.getToBlow(), explosion.getHitPlayers().get(serverplayer)));
+                //serverplayer.connection.send(new ClientboundExplodePacket(x, y, z, pRadius, explosion.getToBlow(), explosion.getHitPlayers().get(serverplayer)));
+                Services.PLATFORM.sendToClient(new CustomExplosionPacketS2C(type,
+                        x, y, z, pRadius, explosion.getToBlow(), explosion.getHitPlayers().get(serverplayer)),serverplayer);
             }
         }
 
         return explosion;
-    }
-
-    public static Explosion createTypedExplosion(Level level, @Nullable Entity source, @Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator damageCalculator, double x, double y, double z, float pRadius, boolean pFire, Explosion.BlockInteraction blockInteraction, ExplosionType type) {
-        switch (type) {
-            case LIGHT -> {
-                return new LavaExplosion(level, source, damageSource, damageCalculator, x, y, z, pRadius, pFire, blockInteraction);
-            }
-            case WEAK -> {
-                return new WeakExplosion(level, source, damageSource, damageCalculator, x, y, z, pRadius, pFire, blockInteraction);
-            }
-            case LAVA_CIRCLE -> {
-                return new LavaExplosionCircle(level, source, damageSource, damageCalculator, x, y, z, pRadius, pFire, blockInteraction);
-            }
-        }
-        return null;
     }
 
     public static Explosion.BlockInteraction getDestroyType(Level level, GameRules.Key<GameRules.BooleanValue> rule) {

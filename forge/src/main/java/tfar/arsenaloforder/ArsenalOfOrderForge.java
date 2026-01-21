@@ -7,8 +7,14 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.boss.wither.WitherBoss;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.monster.Blaze;
+import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.world.entity.monster.warden.Warden;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -66,9 +72,32 @@ public class ArsenalOfOrderForge {
         }
     }
     void drops(LivingDropsEvent event) {
+        LivingEntity target = event.getEntity();
+        Item item = Items.AIR;
+        if (target instanceof Blaze && target.getRandom().nextDouble() < .05) {
+            item = ModItems.WINDBURST_RUNE.get();
+        }
 
+        if (target instanceof Creeper creeper&& creeper.isPowered()) {
+            item = ModItems.VOLTAIC_RUNE.get();
+        }
+
+        if (target instanceof WitherBoss && target.getRandom().nextDouble() < .25) {
+            item = ModItems.MALEVOLENT_RUNE.get();
+        }
+
+        if (target instanceof Warden && target.getRandom().nextDouble() < .5) {
+            item = ModItems.CHAMPION_RUNE.get();
+        }
+        if (item != Items.AIR) {
+            event.getDrops().add(new ItemEntity(target.level(), target.getX(), target.getY(), target.getZ(), item.getDefaultInstance()));
+        }
     }
-
+    //How to obtain each rune
+//WindBurst 5% chance drop from blazes
+//Voltaic Claws 100% chance drop from charged creeper
+//Malevolent Warscythe 25% chance drop from a wither
+//Champions Saber 50% chance drop from a warden
     void onKill(LivingDeathEvent event) {
         DamageSource source = event.getSource();
         if (source.getEntity() instanceof LivingEntity living) {

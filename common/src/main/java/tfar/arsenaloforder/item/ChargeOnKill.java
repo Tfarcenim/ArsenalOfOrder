@@ -32,9 +32,9 @@ public interface ChargeOnKill {
 
     default void activateAbility(ServerPlayer player,ItemStack stack) {
         int charge = getCharge(stack);
-        if (charge>=10) {
+        if (charge>=100) {
             activate(player);
-          //  resetCharge(stack);
+            resetCharge(stack);
         }
     }
 
